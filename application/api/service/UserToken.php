@@ -33,7 +33,7 @@ class UserToken extends Token
         $result = curl_get($this -> wxLoginUrl);
         $wxResult = json_decode($result, true);
 
-        //微信接口返回的错误还并不一定全部包含
+        //微信接口返回的错误还并不一定全部包含, 此处不是很稳定
 
         if (empty($wxResult)) {
             throw new Exception('获取session_key及openID时异常，微信内部错误');
