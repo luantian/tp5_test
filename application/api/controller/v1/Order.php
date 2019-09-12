@@ -9,10 +9,19 @@
 namespace app\api\controller\v1;
 
 
-use think\Controller;
+use app\api\controller\BaseController;
+use app\api\service\Token as TokenService;
+use app\exception\TokenException;
+use app\api\enum\ScopeEnum;
+use app\exception\ForbiddenException;
 
-class Order extends Controller
+
+class Order extends BaseController
 {
+    protected $beforeActionList = [
+        'checkUserOrAdminScope' => ['only' => 'placeOrder']
+    ];
+
     public function placeOrder() {
         return 'order';
     }

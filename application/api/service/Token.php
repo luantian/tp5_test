@@ -10,8 +10,11 @@ namespace app\api\service;
 
 
 use app\exception\TokenException;
+use app\api\enum\ScopeEnum;
+use app\exception\ForbiddenException;
 use think\facade\Cache;
 use think\Exception;
+
 
 class Token
 {
@@ -47,5 +50,42 @@ class Token
     public static function getCurrentUid() {
         $uid = self::getCurrentTokenVar('uid');
         return $uid;
+    }
+
+    //专属Admin权限访问
+    public static function needAdminScope() {
+        self::setExclusiveScope(ScopeEnum::Admin);
+    }
+
+    //专属User权限访问
+    public static function needUserScope() {
+        self::setExclusiveScope(ScopeEnum::User);
+    }
+
+    //User或者Admin权限访问
+    public static function needUserOrAdminScope() {
+        self::setMultipleScope([ScopeEnum::User, ScopeEnum::Admin]);
+    }
+
+    //设置专属权限
+    private static function setExclusiveScope($scopeValue) {
+        $scope = self::getCurrentTokenVar('scope');
+        if ( !$scope ) { throw new TokenException(); }
+        if ($scope == $scopeValue) {
+            return true;
+        } else {
+            throw new ForbiddenException();
+        }
+    }
+
+    //设置多属权限
+    private static function setMultipleScope($scopeValues) {
+        $scope = self::getCurrentTokenVar('scope');
+        if ( !$scope ) { throw new TokenException(); }
+        if (in_array($scope, $scopeValues)) {
+            return true;
+        } else {
+            throw new ForbiddenException();
+        }
     }
 }
